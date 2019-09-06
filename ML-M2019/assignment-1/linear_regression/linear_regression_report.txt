@@ -1,0 +1,14 @@
+Q1. L1 RMSE training/validation/test: 0.678, 0.712, 0.583
+	L2 RMSE training/validaton/test: 0.678, 0.711, 0.464
+
+	RMSE Normal Equations: training, validation: 0.711, 0.73
+
+	RMSE SGD: training, validation: 0.68, 0.71
+
+	It is observed the mean RMSE values obtained by gradient descent are slightly 
+	better (by a magnitude of order 1e-2) as compared to RMSE values obtained by 
+	Normal Equations.
+
+Q2. Regularization (higher lambda values) actually gave a worse fit as compared
+	to standard SGD. All regularized lines eventually converge to the one found 
+	by SGD when regularization parameters ~ 1e-7.

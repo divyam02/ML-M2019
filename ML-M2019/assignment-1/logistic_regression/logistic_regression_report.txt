@@ -1,0 +1,22 @@
+Q1. Training accuracy for L1: ~ 0.80
+	Training accuracy for L2: ~ 0.75
+
+	Validation accuracy for L1 ~ 0.42  
+	Validation accuracy for L2 ~ 0.45
+	
+	Testing accuracy for L1 ~ 0.30
+	Testing accuracy for L2 ~ 0.35
+
+	L2 regularization is performing better during testing due to smaller weight updates
+	as iterations occur, which is also the reason why L1 regularization performs better
+	with a constant step update. Also, the model is sparse and has high variance. L2 
+	regularization performs better on test data with higher variance as compared to 
+	L1 regularization.
+
+Q2. Using Stochastic Averaged Gradient method because of sparse matrices!
+
+	L1 training accuracy: 0.889
+	L1 testing accuracy: 0.892
+
+	L2 training accuracy: 0.889
+	L2 testing accuracy: 0.89

@@ -157,8 +157,51 @@ def multi_logistic_regression():
 	clf = LogisticRegression(penalty='l2', solver='saga',
 							 multi_class='multinomial', tol=0.1)
 	clf.fit(X_train, train_labels)
+	y_score = clf.fit(X_train, train_labels).decision_function(X_test)
 	print("L2 regularized train accuracy:", clf.score(X_train, train_labels))
 	print("L2 regularized test accuracy:", clf.score(X_test, test_labels))
+
+	from sklearn.metrics import roc_curve
+	from sklearn.preprocessing import label_binarize
+	from scipy import interp
+
+	test_labels = label_binarize(test_labels, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+	n_classes = test_labels.shape[1]
+
+	# Compute ROC curve and ROC area for each class
+	fpr = dict()
+	tpr = dict()
+	roc_auc = dict()
+	for i in range(n_classes):
+		print(test_labels[:, i])
+		print(y_score[:, i])
+		fpr[i], tpr[i], _ = roc_curve(test_labels[:, i], y_score[:, i])
+
+	all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+	mean_tpr = np.zeros_like(all_fpr)
+	for i in range(n_classes):
+	    mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+	mean_tpr /= n_classes
+
+	fpr["macro"] = all_fpr
+	tpr["macro"] = mean_tpr
+
+	plt.figure(figsize=(20, 20))
+	for i in range(n_classes):
+		plt.plot(fpr[i], tpr[i], label="ROC curve for class "+str(i))
+
+	plt.plot(range(2), range(2), 'k--')
+	plt.xlim([0.0, 1.0])
+	plt.ylim([0.0, 1.2])
+
+	plt.xlabel('False Positive Rate')
+	plt.ylabel('True Positive Rate')
+	plt.title("ROC Curves for classes")
+	plt.legend(loc='lower right')
+	plt.savefig("ROC_curves.png")
+	plt.show()
+
 
 ################################################
 #	Auxillary Methods
@@ -176,7 +219,6 @@ def test_accuracy(train_dataset, train_truth, weights):
 	pred[pred>=2] = 0
 
 	return np.sum(np.transpose(pred)[0]!=np.transpose(train_truth)[0])/len(pred)
-
 
 
 def weight_update_reg(actual_cost_for_sample, curr_sample, curr_weights,
