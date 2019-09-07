@@ -7,11 +7,16 @@ Q1. Training accuracy for L1: ~ 0.80
 	Testing accuracy for L1 ~ 0.30
 	Testing accuracy for L2 ~ 0.35
 
-	L2 regularization is performing better during testing due to smaller weight updates
-	as iterations occur, which is also the reason why L1 regularization performs better
-	with a constant step update. Also, the model is sparse and has high variance. L2 
-	regularization performs better on test data with higher variance as compared to 
-	L1 regularization.
+	L1 regularization is performing better during training in this dataset
+	despite high variance (outliers) is due to it giving the same weight 
+	update for higher or smaller losses. This makes it robust to noisy data 
+	as provided here (which has 105 features and most values as sparse after
+	preprocessing).
+
+	However L2 regularization ends up performing better during testing because 
+	it is sensitive to outliers and updates weights proportional to the sample
+	feature values. As such, this allows it to be more robust to unseen data 
+	which might be in the outlier region.
 
 Q2. Using Stochastic Averaged Gradient method because of sparse matrices!
 
