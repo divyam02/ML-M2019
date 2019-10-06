@@ -51,12 +51,41 @@ def q1_a():
 		y_1.append(y)
 
 	plt.figure(figsize=(20, 10))
-	plt.scatter(x_0, y_0, color="red", edgecolors="white")
-	plt.scatter(x_1, y_1, color="blue", edgecolors="white")
+	plt.scatter(x_0, y_0, color="blue", edgecolors="white")
+	plt.scatter(x_1, y_1, color="red", edgecolors="white")
+	plt.xticks(())
+	plt.yticks(())
+	plt.title('Scatter plot for given data')
 	plt.savefig('Q1_a')
 
 def q1_b():
-	pass
+	from sklearn import svm
+
+	X, y = extract_h5_files()
+	clf = svm.SVC(gamma='scale')
+	clf.fit(X, y)
+	h = 0.02
+	x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+	y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+	xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+							np.arange(y_min, y_max, h))
+
+	Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+
+	# Put the result into a color plot
+	Z = Z.reshape(xx.shape)
+	plt.figure(figsize=(20, 10))
+
+	plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)
+
+	# Plot also the training points
+	plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors='black')
+	plt.xlim(xx.min(), xx.max())
+	plt.ylim(yy.min(), yy.max())
+	plt.xticks(())
+	plt.yticks(())
+	plt.title('SVM decision boundary using RBF kernel')
+	plt.savefig('Q1_b')
 
 def q1_c():
 	pass
@@ -72,7 +101,7 @@ def q1_d():
 if __name__ == '__main__':
 	# Uncomment question to run.
 	# extract_h5_files()
-	q1_a()
+	# q1_a()
 	# q1_b()
 	# q1_c()
 	# q1_d()
