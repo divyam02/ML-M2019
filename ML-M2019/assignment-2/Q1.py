@@ -24,6 +24,40 @@ def extract_h5_files():
 	# print(np.asarray(x_data).shape, np.asarray(y_data).shape)
 	return np.asarray(x_data), np.asarray(y_data)
 
+def extract_dataset_4_5():
+	x_data = list()
+	y_data = list()
+	for file in os.listdir('./ml_ass_2_data'):
+		h5 = h5py.File('./ml_ass_2_data/'+file, 'r')
+		if file!='data_4.h5' and file!='data_5.h5':
+			continue
+		x_data = h5.get('x').value
+		y_data = h5.get('y').value
+		h5.close()
+
+	# print(x_data, y_data)
+	# print(np.asarray(x_data).shape, np.asarray(y_data).shape)
+	return np.asarray(x_data), np.asarray(y_data)
+
+def homebrew_kernel(X_, Z_):
+	"""
+	Homebrewed RBF kernel
+	"""
+
+	X = np.copy(X_)
+	Z = np.copy(Z_)
+
+	r = list(X.shape)[0]
+	s = list(Z.shape)[0]
+	tex = np.ones(shape=(r, s))
+	for i, x in enumerate(X):
+		for j, z in enumerate(Z):
+			tex[i][j] = np.linalg.norm(x - z)
+
+	np.exp(-1*np.square(tex))
+
+	return tex
+
 ####################	
 #	Questions
 ####################
@@ -60,6 +94,11 @@ def q1_a():
 
 def q1_b():
 	from sklearn import svm
+
+	"""
+	Using code from here: 
+	https://scikit-learn.org/0.18/auto_examples/svm/plot_iris.html
+	"""
 
 	X, y = extract_h5_files()
 	clf = svm.SVC(gamma='scale')
@@ -129,7 +168,32 @@ def q1_c():
 
 
 def q1_d():
-	pass
+	"""
+	For reference:
+	Scikit kernel score: 0.8775
+	Homebrewed kernel score: 0.24
+	"""
+	from sklearn import svm
+	from sklearn.utils import shuffle
+	from sklearn.metrics import accuracy_score
+
+	X, y = extract_dataset_4_5()
+	X, y = shuffle(X, y)
+	split = 4*len(X)//5
+	X_train, X_test = X[:split], X[split:]
+	y_train, y_test = y[:split], y[split:]
+
+	# clf_scikit = svm.SVC(C=1.0, gamma='scale', kernel='rbf')  
+	clf_homebrew = svm.SVC(C=1.0, kernel=homebrew_kernel)
+
+	# clf_scikit.fit(np.copy(X_train), np.copy(y_train))
+	clf_homebrew.fit(np.copy(X_train), np.copy(y_train))
+
+	# preds_scikit = clf_scikit.predict(np.copy(X_test))
+	preds_homebrew = clf_homebrew.predict(np.copy(X_test))
+
+	# print("Scikit kernel score:", accuracy_score(np.copy(y_test), preds_scikit))
+	print("Homebrewed kernel score:", accuracy_score(np.copy(y_test), preds_homebrew))
 
 
 ####################	
@@ -141,5 +205,5 @@ if __name__ == '__main__':
 	# extract_h5_files()
 	# q1_a()
 	# q1_b()
-	q1_c()
-	# q1_d()
+	# q1_c()
+	q1_d()
