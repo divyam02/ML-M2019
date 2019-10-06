@@ -88,7 +88,45 @@ def q1_b():
 	plt.savefig('Q1_b')
 
 def q1_c():
-	pass
+	from sklearn import svm
+
+	X, y = extract_h5_files()
+	clf = svm.SVC(gamma='scale')
+	clf.fit(X, y)
+	preds = clf.predict(X)
+	# print(y)
+	# print(y.shape)	
+	mis = preds==y
+	print(mis)
+	print(mis.shape)
+	A = np.argwhere(y==0)
+	B = np.argwhere(y==1)	
+
+	x_0 = list()
+	y_0 = list()
+	x_1 = list()
+	y_1 = list()
+
+	for z in A:
+		if mis[z]==True:
+			x, y = X[z][0]
+			x_0.append(x)
+			y_0.append(y)
+
+	for z in B:
+		if mis[z]==True:
+			x, y = X[z][0]
+			x_1.append(x)
+			y_1.append(y)
+
+	plt.figure(figsize=(20, 10))
+	plt.scatter(x_0, y_0, color="blue", edgecolors="white")
+	plt.scatter(x_1, y_1, color="red", edgecolors="white")
+	plt.xticks(())
+	plt.yticks(())
+	plt.title('Scatter plot with noise removed')
+	plt.savefig('Q1_c')
+
 
 def q1_d():
 	pass
@@ -103,5 +141,5 @@ if __name__ == '__main__':
 	# extract_h5_files()
 	# q1_a()
 	# q1_b()
-	# q1_c()
+	q1_c()
 	# q1_d()
