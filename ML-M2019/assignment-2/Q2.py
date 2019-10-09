@@ -34,6 +34,50 @@ def get_dataset():
 
 	return np.asarray(x_data), np.asarray(y_data)
 
+
+def make_ROC():
+	from sklearn import svm
+	from sklearn.metrics import roc_curve
+	from sklearn.preprocessing import label_binarize
+	from scipy import interp
+
+	test_labels = label_binarize(test_labels, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+	n_classes = test_labels.shape[1]
+
+	# Compute ROC curve and ROC area for each class
+	fpr = dict()
+	tpr = dict()
+	roc_auc = dict()
+	for i in range(n_classes):
+		print(test_labels[:, i])
+		print(y_score[:, i])
+		fpr[i], tpr[i], _ = roc_curve(test_labels[:, i], y_score[:, i])
+
+	all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+	mean_tpr = np.zeros_like(all_fpr)
+	for i in range(n_classes):
+	    mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+	mean_tpr /= n_classes
+
+	fpr["macro"] = all_fpr
+	tpr["macro"] = mean_tpr
+
+	plt.figure(figsize=(20, 20))
+	for i in range(n_classes):
+		plt.plot(fpr[i], tpr[i], label="ROC curve for class "+str(i))
+
+	plt.plot(range(2), range(2), 'k--')
+	plt.xlim([0.0, 1.0])
+	plt.ylim([0.0, 1.2])
+
+	plt.xlabel('False Positive Rate')
+	plt.ylabel('True Positive Rate')
+	plt.title("ROC Curves for classes")
+	plt.legend(loc='lower right')
+	plt.savefig("ROC_curves.png")
+	plt.show()
+
 ####################
 #	Questions
 ####################
@@ -115,8 +159,50 @@ def no_kernel_svm():
 		print("Accuracy:", accuracy_score(y_test, preds))
 		print("F1 Score:", f1_score(y_test, preds, average=None))
 		print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
-		with open('no_kernel_ovo_fold_'+str(i), 'wb') as f:
-			pickle.dump(clf, f)
+		# with open('no_kernel_ovo_fold_'+str(i), 'wb') as f:
+		# 	pickle.dump(clf, f)
+
+		from sklearn import svm
+		from sklearn.metrics import roc_curve
+		from sklearn.preprocessing import label_binarize
+		from scipy import interp
+
+		test_labels = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		n_classes = test_labels.shape[1]
+		y_score = clf.decision_function(X_test)
+		# Compute ROC curve and ROC area for each class
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		for z in range(n_classes):
+			# print(test_labels[:, z])
+			# print(y_score[:, z])
+			fpr[z], tpr[z], _ = roc_curve(test_labels[:, z], y_score[:, z])
+
+		all_fpr = np.unique(np.concatenate([fpr[z] for z in range(n_classes)]))
+		mean_tpr = np.zeros_like(all_fpr)
+		for z in range(n_classes):
+		    mean_tpr += interp(all_fpr, fpr[z], tpr[z])
+
+		mean_tpr /= n_classes
+
+		fpr["macro"] = all_fpr
+		tpr["macro"] = mean_tpr
+
+		plt.figure(figsize=(20, 20))
+		for z in range(n_classes):
+			plt.plot(fpr[z], tpr[z], label="ROC curve for class "+str(z))
+
+		plt.plot(range(2), range(2), 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.2])
+
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title("ROC Curves for classes")
+		plt.legend(loc='lower right')
+		plt.savefig("fold_"+str(i)+"_ROC_curves_ovo_linear.png")
+		plt.show()
 
 
 	for i in range(5):
@@ -145,8 +231,52 @@ def no_kernel_svm():
 		print("Accuracy:", accuracy_score(y_test, preds))
 		print("F1 Score:", f1_score(y_test, preds, average=None))
 		print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
-		with open('no_kernel_ovr_fold_'+str(i), 'wb') as f:
-			pickle.dump(clf, f)
+		# with open('no_kernel_ovr_fold_'+str(i), 'wb') as f:
+		# 	pickle.dump(clf, f)
+
+
+		from sklearn import svm
+		from sklearn.metrics import roc_curve
+		from sklearn.preprocessing import label_binarize
+		from scipy import interp
+
+		test_labels = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		n_classes = test_labels.shape[1]
+		y_score = clf.decision_function(X_test)
+		# Compute ROC curve and ROC area for each class
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		for z in range(n_classes):
+			# print(test_labels[:, z])
+			# print(y_score[:, z])
+			fpr[z], tpr[z], _ = roc_curve(test_labels[:, z], y_score[:, z])
+
+		all_fpr = np.unique(np.concatenate([fpr[z] for z in range(n_classes)]))
+		mean_tpr = np.zeros_like(all_fpr)
+		for z in range(n_classes):
+		    mean_tpr += interp(all_fpr, fpr[z], tpr[z])
+
+		mean_tpr /= n_classes
+
+		fpr["macro"] = all_fpr
+		tpr["macro"] = mean_tpr
+
+		plt.figure(figsize=(20, 20))
+		for z in range(n_classes):
+			plt.plot(fpr[z], tpr[z], label="ROC curve for class "+str(z))
+
+		plt.plot(range(2), range(2), 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.2])
+
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title("ROC Curves for classes")
+		plt.legend(loc='lower right')
+		plt.savefig("fold_"+str(i)+"ROC_curves_ovr_linear.png")
+		plt.show()
+
 
 def rbf_kernel_svm():
 	from sklearn import svm
@@ -225,8 +355,50 @@ def rbf_kernel_svm():
 		print("Accuracy:", accuracy_score(y_test, preds))
 		print("F1 Score:", f1_score(y_test, preds, average=None))
 		print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
-		with open('rbf_kernel_ovo_fold_'+str(i), 'wb') as f:
-			pickle.dump(clf, f)
+		# with open('rbf_kernel_ovo_fold_'+str(i), 'wb') as f:
+		# 	pickle.dump(clf, f)
+
+		from sklearn import svm
+		from sklearn.metrics import roc_curve
+		from sklearn.preprocessing import label_binarize
+		from scipy import interp
+
+		test_labels = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		n_classes = test_labels.shape[1]
+		y_score = clf.decision_function(X_test)
+		# Compute ROC curve and ROC area for each class
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		for z in range(n_classes):
+			# print(test_labels[:, z])
+			# print(y_score[:, z])
+			fpr[z], tpr[z], _ = roc_curve(test_labels[:, z], y_score[:, z])
+
+		all_fpr = np.unique(np.concatenate([fpr[z] for z in range(n_classes)]))
+		mean_tpr = np.zeros_like(all_fpr)
+		for z in range(n_classes):
+		    mean_tpr += interp(all_fpr, fpr[z], tpr[z])
+
+		mean_tpr /= n_classes
+
+		fpr["macro"] = all_fpr
+		tpr["macro"] = mean_tpr
+
+		plt.figure(figsize=(20, 20))
+		for z in range(n_classes):
+			plt.plot(fpr[z], tpr[z], label="ROC curve for class "+str(z))
+
+		plt.plot(range(2), range(2), 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.2])
+
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title("ROC Curves for classes")
+		plt.legend(loc='lower right')
+		plt.savefig("fold_"+str(i)+"ROC_curves_ovo_rbf.png")
+		plt.show()
 
 
 	for i in range(5):
@@ -255,8 +427,50 @@ def rbf_kernel_svm():
 		print("Accuracy:", accuracy_score(y_test, preds))
 		print("F1 Score:", f1_score(y_test, preds, average=None))
 		print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
-		with open('rbf_kernel_ovr_fold_'+str(i), 'wb') as f:
-			pickle.dump(clf, f)
+		# with open('rbf_kernel_ovr_fold_'+str(i), 'wb') as f:
+		# 	pickle.dump(clf, f)
+
+		from sklearn import svm
+		from sklearn.metrics import roc_curve
+		from sklearn.preprocessing import label_binarize
+		from scipy import interp
+
+		test_labels = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		n_classes = test_labels.shape[1]
+		y_score = clf.decision_function(X_test)
+		# Compute ROC curve and ROC area for each class
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		for z in range(n_classes):
+			# print(test_labels[:, z])
+			# print(y_score[:, z])
+			fpr[z], tpr[z], _ = roc_curve(test_labels[:, z], y_score[:, z])
+
+		all_fpr = np.unique(np.concatenate([fpr[z] for z in range(n_classes)]))
+		mean_tpr = np.zeros_like(all_fpr)
+		for z in range(n_classes):
+		    mean_tpr += interp(all_fpr, fpr[z], tpr[z])
+
+		mean_tpr /= n_classes
+
+		fpr["macro"] = all_fpr
+		tpr["macro"] = mean_tpr
+
+		plt.figure(figsize=(20, 20))
+		for z in range(n_classes):
+			plt.plot(fpr[z], tpr[z], label="ROC curve for class "+str(z))
+
+		plt.plot(range(2), range(2), 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.2])
+
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title("ROC Curves for classes")
+		plt.legend(loc='lower right')
+		plt.savefig("fold_"+str(i)+"ROC_curves_ovr_rbf.png")
+		plt.show()
 
 def quad_kernel_svm():
 	from sklearn import svm
@@ -335,8 +549,50 @@ def quad_kernel_svm():
 		print("Accuracy:", accuracy_score(y_test, preds))
 		print("F1 Score:", f1_score(y_test, preds, average=None))
 		print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
-		with open('quad_kernel_ovo_fold_'+str(i), 'wb') as f:
-			pickle.dump(clf, f)
+		# with open('quad_kernel_ovo_fold_'+str(i), 'wb') as f:
+		# 	pickle.dump(clf, f)
+
+		from sklearn import svm
+		from sklearn.metrics import roc_curve
+		from sklearn.preprocessing import label_binarize
+		from scipy import interp
+
+		test_labels = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		n_classes = test_labels.shape[1]
+		y_score = clf.decision_function(X_test)
+		# Compute ROC curve and ROC area for each class
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		for z in range(n_classes):
+			# print(test_labels[:, z])
+			# print(y_score[:, z])
+			fpr[z], tpr[z], _ = roc_curve(test_labels[:, z], y_score[:, z])
+
+		all_fpr = np.unique(np.concatenate([fpr[z] for z in range(n_classes)]))
+		mean_tpr = np.zeros_like(all_fpr)
+		for z in range(n_classes):
+		    mean_tpr += interp(all_fpr, fpr[z], tpr[z])
+
+		mean_tpr /= n_classes
+
+		fpr["macro"] = all_fpr
+		tpr["macro"] = mean_tpr
+
+		plt.figure(figsize=(20, 20))
+		for z in range(n_classes):
+			plt.plot(fpr[z], tpr[z], label="ROC curve for class "+str(z))
+
+		plt.plot(range(2), range(2), 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.2])
+
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title("ROC Curves for classes")
+		plt.legend(loc='lower right')
+		plt.savefig("fold_"+str(i)+"ROC_curves_ovo_quad.png")
+		plt.show()
 
 
 	for i in range(5):
@@ -365,14 +621,56 @@ def quad_kernel_svm():
 		print("Accuracy:", accuracy_score(y_test, preds))
 		print("F1 Score:", f1_score(y_test, preds, average=None))
 		print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
-		with open('quad_kernel_ovr_fold_'+str(i), 'wb') as f:
-			pickle.dump(clf, f)
+		# with open('quad_kernel_ovr_fold_'+str(i), 'wb') as f:
+		# 	pickle.dump(clf, f)
+
+		from sklearn import svm
+		from sklearn.metrics import roc_curve
+		from sklearn.preprocessing import label_binarize
+		from scipy import interp
+
+		test_labels = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+		n_classes = test_labels.shape[1]
+		y_score = clf.decision_function(X_test)
+		# Compute ROC curve and ROC area for each class
+		fpr = dict()
+		tpr = dict()
+		roc_auc = dict()
+		for z in range(n_classes):
+			# print(test_labels[:, z])
+			# print(y_score[:, z])
+			fpr[z], tpr[z], _ = roc_curve(test_labels[:, z], y_score[:, z])
+
+		all_fpr = np.unique(np.concatenate([fpr[z] for z in range(n_classes)]))
+		mean_tpr = np.zeros_like(all_fpr)
+		for z in range(n_classes):
+		    mean_tpr += interp(all_fpr, fpr[z], tpr[z])
+
+		mean_tpr /= n_classes
+
+		fpr["macro"] = all_fpr
+		tpr["macro"] = mean_tpr
+
+		plt.figure(figsize=(20, 20))
+		for z in range(n_classes):
+			plt.plot(fpr[z], tpr[z], label="ROC curve for class "+str(z))
+
+		plt.plot(range(2), range(2), 'k--')
+		plt.xlim([0.0, 1.0])
+		plt.ylim([0.0, 1.2])
+
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title("ROC Curves for classes")
+		plt.legend(loc='lower right')
+		plt.savefig("fold_"+str(i)+"ROC_curves_ovr_quad.png")
+		plt.show()
 
 ####################
 #	Main
 ####################
 
 if __name__ == '__main__':
-	# no_kernel_svm()
-	# rbf_kernel_svm()
-	# quad_kernel_svm()
+	no_kernel_svm()
+	rbf_kernel_svm()
+	quad_kernel_svm()
