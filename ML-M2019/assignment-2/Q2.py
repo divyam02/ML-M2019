@@ -34,6 +34,19 @@ def get_dataset():
 
 	return np.asarray(x_data), np.asarray(y_data)
 
+def get_test_dataset():
+	import pickle
+	x_data = list()
+	y_data = list()
+	files = ['test_batch']
+	for file in files:
+		with open('./cifar_data/cifar-10-batches-py/'+file, 'rb') as fo:
+			temp = pickle.load(fo, encoding='bytes')
+			# print(temp.keys())
+			x_data.append(temp[b'data'])
+			y_data.append(temp[b'labels'])
+
+	return np.asarray(x_data), np.asarray(y_data)
 
 def make_ROC():
 	from sklearn import svm
@@ -666,11 +679,128 @@ def quad_kernel_svm():
 		plt.savefig("fold_"+str(i)+"ROC_curves_ovr_quad.png")
 		plt.show()
 
+def test_kernels():
+	from sklearn import svm
+	from sklearn import preprocessing
+	from sklearn.utils import shuffle
+	from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
+	import pickle
+
+	X_, y_ = get_dataset()
+	"""
+	
+	"""
+	# print(X)
+	# print(y)
+	# print(X.shape)
+	# print(y.shape)
+	X, y = np.copy(X_), np.copy(y_)
+
+	# for i in range(X.shape[0]):
+	# print("Fold:", str(i+1))
+	temp_X = None
+	temp_y = None
+
+	for j in range(X.shape[0]):
+		# if j==i:
+		# 	continue
+		try:
+			temp_X = np.concatenate((temp_X, X[j]), axis=0)
+			temp_y = np.concatenate((temp_y, y[j]), axis=0)
+		except:
+			temp_X = np.copy(X[j])
+			temp_y = np.copy(y[j])
+
+
+	X_train = list()
+	y_train = list()
+
+	# print(temp_X.shape, temp_y.shape)
+
+	sum_list = [0]*10
+	j = 0
+	while sum(sum_list)!=5000:
+		if sum_list[temp_y[j]]<500:
+			# print(temp_y[j])
+			# print(temp_X[j])
+			sum_list[temp_y[j]]+=1
+			X_train.append(temp_X[j])
+			y_train.append(temp_y[j])
+			
+		j+=1
+
+	a, b = get_test_dataset()
+	a, b = a.squeeze(), b.squeeze()
+	X_test = list()
+	y_test = list()
+
+	print(a.shape, b.shape)
+
+	sum_list = [0]*10
+	j = 0
+	while sum(sum_list)!=1000:
+		if sum_list[b[j]]<100:
+			# print(temp_y[j])
+			# print(temp_X[j])
+			sum_list[b[j]]+=1
+			X_test.append(a[j])
+			y_test.append(b[j])
+			
+		j+=1
+
+	X_train, y_train = np.asarray(X_train), np.asarray(y_train)
+	X_test, y_test = np.asarray(X_test), np.asarray(y_test) 
+
+	scaler = preprocessing.StandardScaler().fit(X_train)
+	X_train = scaler.transform(X_train)
+	X_test = scaler.transform(X_test)
+	y_test = np.copy(y_test)
+
+	assert X_train.shape[0]==5000
+	assert X_test.shape[0]==1000
+
+	# print(X_train)
+	# print(y_train)
+	print(X_train.shape, y_train.shape)
+
+	clf = svm.SVC(kernel='poly', decision_function_shape='ovr', degree=2, coef0=1)
+	print('training...')
+	clf.fit(X_train, y_train)		
+	print('predicting...')
+	preds = clf.predict(X_test)
+	# print("Fold: "+str(i+1))
+	print("Accuracy:", accuracy_score(y_test, preds))
+	print("F1 Score:", f1_score(y_test, preds, average=None))
+	print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
+
+	clf = svm.SVC(kernel='rbf', decision_function_shape='ovr')
+	print('training...')
+	clf.fit(X_train, y_train)		
+	print('predicting...')
+	preds = clf.predict(X_test)
+	# print("Fold: "+str(i+1))
+	print("Accuracy:", accuracy_score(y_test, preds))
+	print("F1 Score:", f1_score(y_test, preds, average=None))
+	print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
+
+	clf = svm.SVC(kernel='linear', decision_function_shape='ovr')
+	print('training...')
+	clf.fit(X_train, y_train)		
+	print('predicting...')
+	preds = clf.predict(X_test)
+	# print("Fold: "+str(i+1))
+	print("Accuracy:", accuracy_score(y_test, preds))
+	print("F1 Score:", f1_score(y_test, preds, average=None))
+	print("Confusion Matrix:", confusion_matrix(y_test, preds), '\n')
+	# with open('quad_kernel_ovr_fold_'+str(i), 'wb') as f:
+	# 	pickle.dump(clf, f)
+
 ####################
 #	Main
 ####################
 
 if __name__ == '__main__':
-	no_kernel_svm()
-	rbf_kernel_svm()
-	quad_kernel_svm()
+	# no_kernel_svm()
+	# rbf_kernel_svm()
+	# quad_kernel_svm()
+	test_kernels()

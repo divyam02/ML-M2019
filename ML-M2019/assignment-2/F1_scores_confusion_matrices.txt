@@ -586,5 +586,58 @@ Confusion Matrix:
 #	Analysis
 ####################
 
-From the 30 models, it would appear from the F1 scores and confusion matrices that the quadratic kernel seems to perform
-better.
+From the 30 models, it would appear from the F1 scores and confusion matrices that the quadratic kernel seems to perform better, but RBF performs similarly. 
+Clearly the model is able to find separating hyperplanes for all classes with some regularization in higher dimension representations.
+
+Poly Kernel
+(10000, 3072) (10000,)
+(5000, 3072) (5000,)
+training...
+predicting...
+Accuracy: 0.427
+F1 Score: [0.47524752 0.55367232 0.3627907  0.29189189 0.30985915 0.27777778 0.45454545 0.46073298 0.56502242 0.50515464]
+Confusion Matrix: 
+[[48  1  6  1  5  3  7  2 20  7]
+ [ 5 49  5  4  2  2  3  5 11 14]
+ [11  1 39  6 12  7  9  7  8  0]
+ [ 4  4  7 27 11 16 16  8  2  5]
+ [ 7  3 20  7 33  6 13  7  3  1]
+ [ 2  2 12 21 13 25 10 10  2  3]
+ [ 1  2 15  4 18  6 50  1  0  3]
+ [ 6  0  7  7 16  7  7 44  1  5]
+ [13  2  1  3  3  6  1  1 63  7]
+ [ 5 13  3  5  0  2  4  6 13 49]] 
+
+RBF Kernel
+training...
+predicting...
+Accuracy: 0.426
+F1 Score: [0.44       0.54945055 0.32323232 0.28571429 0.26732673 0.35483871 0.45535714 0.47311828 0.59090909 0.49765258]
+Confusion Matrix: 
+[[44  1  4  3  5  4  2  3 24 10]
+ [ 5 50  3  4  3  2  5  3  9 16]
+ [13  2 32  9 17  6 11  4  4  2]
+ [ 8  5  7 27  8 16 17  7  1  4]
+ [ 7  4 22  4 27  7 15  7  3  4]
+ [ 3  4 11 22  9 33 10  4  2  2]
+ [ 2  2  9  6 18  3 51  4  1  4]
+ [ 4  1  6  9 12  7  8 44  1  8]
+ [ 9  2  2  2  3  5  0  2 65 10]
+ [ 5 11  2  3  0  3  5  8 10 53]] 
+
+Linear Kernel
+training...
+predicting...
+Accuracy: 0.294
+F1 Score: [0.35135135 0.38565022 0.2629108  0.24324324 0.24509804 0.13186813 0.33333333 0.28089888 0.37962963 0.30120482]
+Confusion Matrix: 
+[[39  2 12  3  3  3  3  8 20  7]
+ [ 4 43  5  5  4  8  4  4  8 15]
+ [14  8 28  9 16  5  6  5  7  2]
+ [ 4 10 10 27  9 14 10  7  6  3]
+ [ 9  6 22 11 25  8  6  9  2  2]
+ [10  4 11 27 15 12  9  6  4  2]
+ [ 3  5 10 19 16 11 29  2  4  1]
+ [12  4 10 11 13 11  4 25  7  3]
+ [21 10  4  3  2  7  2  4 41  6]
+ [ 6 31  1  7  1  3  1  8 17 25]] 
