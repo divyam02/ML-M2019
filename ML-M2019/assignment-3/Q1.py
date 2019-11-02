@@ -13,7 +13,7 @@ class Neural_Net():
 		"""
 		self.hidden_layers = layers-2
 		self.activation_fn = activation_fn
-
+		self.batch_size = 1
 		assert isinstance(nodes_per_layer, list)
 
 		self.weights = dict()
@@ -31,6 +31,7 @@ class Neural_Net():
 		Assume all preprocessing has been done.
 		"""
 		raise NotImplementedError
+		self.batch_size = batch_size
 
 		for epoch in range(epochs):
 
@@ -51,61 +52,81 @@ class Neural_Net():
 		"""
 		Return ReLU activation
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		# if x > 0:
+		# 	return x
+		# return 0
+		return np.maximum(x, 0)
 
 	def sigmoid(self, x):
 		"""
 		Return sigmoid activation
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return 1/(1 + np.exp(-1*x))
 
-	def linear(self, x):
+	def linear(self, x, c=0.5):
 		"""
-		Return Linear activation
+		Return Linear activation. Chose 
+		c parameter arbitrarily
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return c*x
 
 	def tanh(self, x):
 		"""
 		Return Tanh activation
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return (np.exp(x) - np.exp(-x))/(np.exp(x) + np.exp(-x))
 
-	def softmax(self, x):
+	def softmax(self, x, label_index):
 		"""
 		Return Softmax activation
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return np.exp(x[label_index])/(np.sum(np.exp(x)))
 
 	def d_relu(self, x):
 		"""
-		Return derivative of ReLU
+		Return derivative of ReLU. If 
+		y = f(x) then dy/dx = f'(x)
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		temp = np.copy(x)
+		temp[x<=0] = 0
+		temp[x>0] = 1
+		return temp
 
 	def d_sigmoid(self, x):
 		"""
 		Return derivative of Sigmoid
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return self.sigmoid(x)*(1 - self.sigmoid(x))
 
-	def d_linear(self, x):
+	def d_linear(self, x, c=0.5):
 		"""
 		Return derivative of Linear
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return c
 
 	def d_tanh(self, x):
 		"""
 		Return derivative of Tanh
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		return  1 - np.square(self.tanh(x))
 
-	def d_softmax(self, x):
+	def d_softmax(self, x, label_index, var_index):
 		"""
 		Return derivative of Softmax
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		k_delta = 0
+		if label_index==var_index: k_delta = 1
+		return self.softmax(x, label_index)*(k_delta - self.softmax(x, var_index))
 
 	def lr_decay(self, current_lr):
 		"""
@@ -121,12 +142,14 @@ class Neural_Net():
 			return True
 		return False
 
-	def get_CE_loss(self, soft_fc_output, truth_dist):
+	def get_CE_loss(self, soft_fc_output, truth_dist, batch_size=None):
 		"""
 		Return cross entropy loss. Assuming batch to be 
 		something like mxn shape, 
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
+		temp = np.sum(np.multiply(truth_dist, np.log(soft_fc_output+1e-12)))
+		return -1 * temp / self.batch_size
 
 #####################################################################
 #						  Auxillary Methods							#
