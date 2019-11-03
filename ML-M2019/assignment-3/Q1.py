@@ -11,8 +11,9 @@ class Neural_Net():
 
 		Hidden layers including prediction are indexed from 0.
 		"""
+		self.layers = layers
 		self.hidden_layers = layers-2
-		self.activation_fn = activation_fn
+		self.activation_fn = get_activation_fn(activation_fn)
 		self.batch_size = 1
 		assert isinstance(nodes_per_layer, list)
 
@@ -20,7 +21,7 @@ class Neural_Net():
 		self.bias = dict()
 		# nodes_per_hidden_layer = nodes_per_layer[1:]
 
-		for i in range(layers-1):
+		for i in range(self.layers-1):
 			self.weights[i] = 0.01 * np.random.normal(0, 1, (nodes_per_layer[i+1], nodes_per_layer[i]))
 			self.bias[i] = np.zeros(nodes_per_layer[i+1])
 
@@ -184,17 +185,32 @@ class Neural_Net():
 		temp = np.sum(np.multiply(truth_dist, np.log(soft_fc_output+1e-12)))
 		return -1 * temp / self.batch_size
 
+	def get_d_CE(self, x):
+		"""
+		Return derivative of Negative Log Likelihood Loss.
+		"""
+		return -1/x
+
 	def forward(self, batch):
 		"""
 		Return batch logits output of network
 		"""
-		raise NotImplementedError
+		# raise NotImplementedError
 
-	def backward(self):
+		for i in range(self.layers-1):
+			batch = self.activation_fn(np.dot(batch, self.weights[i].T) + self.bias[i])
+
+		return batch
+
+	def backward(self, error):
 		"""
 		Update weights and biases!
 		"""
 		raise NotImplementedError
+		d_error_fc =
+
+
+
 
 #####################################################################
 #						  Auxillary Methods							#
