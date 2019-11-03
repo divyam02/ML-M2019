@@ -14,6 +14,7 @@ class Neural_Net():
 		self.layers = layers
 		self.hidden_layers = layers-2
 		self.activation_fn = get_activation_fn(activation_fn)
+		self.d_activation_fn = get_d_activation_fn(activation_fn)
 		self.batch_size = 1
 		assert isinstance(nodes_per_layer, list)
 
@@ -182,33 +183,43 @@ class Neural_Net():
 		something like mxn shape.
 		"""
 		# raise NotImplementedError
-		temp = np.sum(np.multiply(truth_dist, np.log(soft_fc_output+1e-12)))
-		return -1 * temp / self.batch_size
+		temp = np.multiply(truth_dist, np.log(soft_fc_output+1e-12))
+		batch_loss = -1 * np.sum(temp)/self.batch_size
+		sample_wise_loss = -1 * np.max(temp)/self.batch_size
+		return batch_loss, sample_wise_loss
 
-	def get_d_CE(self, x):
+	def d_nll(self, x):
 		"""
 		Return derivative of Negative Log Likelihood Loss.
 		"""
-		return -1/x
+		return -1 * 1/np.exp(-1*x)
 
 	def forward(self, batch):
 		"""
 		Return batch logits output of network
 		"""
 		# raise NotImplementedError
-
-		for i in range(self.layers-1):
+		self.forward_list = list()
+		for i in range(self.layers):
+			forward_list.append((batch, self.weights[i], self.bias[i]))
 			batch = self.activation_fn(np.dot(batch, self.weights[i].T) + self.bias[i])
 
 		return batch
 
-	def backward(self, error):
+	def backward(self, sample_wise_loss):
 		"""
 		Update weights and biases!
+		General stucture:
+		CE_loss <- Softmax_FC <- Logits_FC <- Weights
 		"""
 		raise NotImplementedError
-		d_error_fc =
-
+		# Return d_nll for correct class for each sample!
+		d_CELoss_SoftmaxFC = d_nll(sample_wise_loss)
+		d_CELoss_LogitsFC = d_CELoss_SoftmaxFC * d_softmax(d_CELoss_SoftmaxFC)
+		temp = np.copy(d_CELoss_LogitsFC)
+		for i in range(self.layers-1, 0, -1):
+			temp = temp * self.d_activation_fn(temp)
+			temp = temp * self.forward_list[i][0]
 
 
 
