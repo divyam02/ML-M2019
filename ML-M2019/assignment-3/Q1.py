@@ -214,13 +214,18 @@ class Neural_Net():
 		"""
 		raise NotImplementedError
 		# Return d_nll for correct class for each sample!
+		self.weight_update = dict()
+		self.bias_update = dict()
+
 		d_CELoss_SoftmaxFC = d_nll(sample_wise_loss)
 		d_CELoss_LogitsFC = d_CELoss_SoftmaxFC * d_softmax(d_CELoss_SoftmaxFC)
 		temp = np.copy(d_CELoss_LogitsFC)
+
 		for i in range(self.layers-1, 0, -1):
 			temp = temp * self.d_activation_fn(temp)
-			temp = temp * self.forward_list[i][0]
-
+			self.weight_update[i] = self.lr * temp * self.forward_list[i][0]
+			bias_update = temp
+			self.bias_update[i] = self.lr* temp
 
 
 #####################################################################
